@@ -1,30 +1,11 @@
 import './App.css';
+import Location from './location/Location.js';
 
 import Wrap from './wrap/Wrap.js'
 
-function rad(x) {
-  return x * Math.PI / 180;
-}
+import fetchCoords from './maps/fetchCoords.js';
 
-function deg(x) {
-  return x * 180 / Math.PI;
-}
-
-function sin(x) {
-  return Math.sin(rad(x))
-}
-
-function cos(x) {
-  return Math.cos(rad(x))
-}
-
-function atan2(x, y) {
-  return Math.atan2(rad(x), rad(y))
-}
-
-function delta(x, y) {
-  return x - y
-}
+import React from 'react';
 
 function beta(lat1, lon1, lat2, lon2) {
 
@@ -41,17 +22,63 @@ function beta(lat1, lon1, lat2, lon2) {
   return (θ * 180 / Math.PI + 360) % 360
 }
 
-function App() {  
+class App extends React.Component {
 
-    console.log("beta(Kansas City, St Louis) = " + beta(39.099912, -94.581213, 38.627089, -90.200203))
-    console.log("beta(Madrid, New York) = " + beta(40.4168, -3.7038, 40.7128, -74.0060))
-    console.log("beta(London, Cape Town) = " + beta( 51.500153, -0.126236, -33.923775, 18.423346))
-    console.log("beta(Brixton, Madrid) = " + beta( 51.4572844, -0.1180884,  40.416691,  -3.700345 ))
-    
+  constructor(props) {
+    super(props);
+    this.state = {
+      locations: [
+        new Location("Buenos Aires", -34.6, -58.4),
+        new Location("Vauxhall", 51.5, -0.12)
+      ]
+    }
+  }
 
+  async updateCoords() {
+    for (let i = 0; i < this.state.locations.length; i++) {
+      fetchCoords(this.state.locations[i].name).then(location => {
+        this.setState((curr, props) => ({
+          locations: curr.locations.map((item, j) => i === j ? new Location(this.state.locations[i].name, location.lat, location.lng) : item)
+        }))
+      })
+    }
+  }
+
+  updateName(i, str) {
+    this.setState((curr, props) => ({
+      locations: curr.locations.map((location, j) => i === j ? new Location(str, location.lat, location.lng) : location)
+    }))
+  }
+
+  addLocation() {
+    this.setState(curr => ({
+      locations: curr.locations.concat(new Location("", 0, 0))
+    }))
+  }
+
+  render() {
+
+    // let x = 51.4613;
+    // let y = -0.1156;
+
+    // console.log("beta(Brixton, Buenos Aires) = " + beta(x, y, -34.6037, -58.3816))
+    // console.log("beta(Brixton, Vauxhall) = " + beta(x, y, 51.4862, -0.1217))    
+    // console.log("beta(Brixton, New Delhi) = " + beta(x, y, 28.6139, 77.2090))    
+    // console.log("beta(Brixton, Washington D.C.) = " + beta(x, y, 38.9072, -77.0369))    
+    // console.log("beta(Brixton, Paris) = " + beta(x, y, 48.8566, 2.3522))    
+    // console.log("beta(Brixton, Holloway) = " + beta(x, y, 51.5570, -0.1155))    
+    // console.log("beta(Brixton, Cambridge) = " + beta(x, y, 52.2053, 0.1218))    
+    // console.log("beta(Brixton, Madrid) = " + beta(x, y, 40.4168, -3.7038))        
+    // console.log("beta(Brixton, Santiago) = " + beta(x, y, -33.4489, -70.6693)) 
     return (
-      <Wrap/>
-    );
+        Wrap({
+          locations: this.state.locations,
+          addLocation: this.addLocation.bind(this),
+          updateCoords: this.updateCoords.bind(this),
+          updateName: this.updateName.bind(this)
+        })
+      );
+  }
 
 }
 

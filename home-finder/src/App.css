@@ -36,3 +36,27 @@
     transform: rotate(360deg);
   }
 }
+
+/* my styles */
+
+.parent {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+.image1 {
+  position: relative; 
+  top: 0;
+  left: 0;
+}
+.image2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-left: 10;
+}
+
+.main {
+  max-width: 1000px;
+  padding: 50px;
+}
