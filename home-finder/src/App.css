@@ -57,6 +57,22 @@
 }
 
 .main {
-  max-width: 1000px;
-  padding: 50px;
+  padding: 25px;
+}
+
+.compass-container {
+  margin: 100px;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.compass-background {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.compass-item {
+  position: absolute;
 }
