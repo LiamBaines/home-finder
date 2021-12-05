@@ -1,10 +1,13 @@
 import LocationInput from '../location/LocationInput.js';
 
+import useQuery from '../router/useQuery.js';
+
 import React from 'react';
 
 import Compass from '../compass/Compass.js';
 
 function Wrap(props) {
+  props.readLocationsFromQuery(useQuery());
   let locations = props.locations.map((location, i) => new LocationInput(location, i, props.updateName));
   return (   
     <div>

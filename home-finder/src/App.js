@@ -3,6 +3,12 @@ import Location from './location/Location.js';
 
 import Wrap from './wrap/Wrap.js'
 
+import {
+  BrowserRouter as Router,
+  Link,
+  useLocation
+} from "react-router-dom";
+
 import calculateBearing from './maps/calculateBearing.js';
 import fetchCoords from './maps/fetchCoords.js';
 
@@ -13,17 +19,11 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      locationsLoaded: false,
       locations: [
-        new Location("Brixton, London", 51.4613, -0.1156, 0),
-        new Location("Buenos Aires, Argentina", -34.6037, -58.3816, 225.3122),
-        new Location("Vauxhall, London", 51.4862, -0.1217, 351.3264),
-        new Location("New Delhi, India", 28.6139, 77.209, 80.21),
-        new Location("Washington DC, USA", 38.9072, -77.0369, 288.5),
-        new Location("Paris, France", 48.8566, -2.3522, 147.79),
-        new Location("Holloway, London", 51.5570, -0.1155, 0.03),
-        new Location("Cambridge, UK", 52.2053, 0.1218, 11.06),
-        new Location("Madrid, Spain", 40.4168, -3.7038, 194.05),
-        new Location("Santiago, Chile", -33.4489, -70.6693, 234.52)
+        new Location("Paris", 48.8566, 2.3522, 0),
+        new Location("Berlin", 52.5200, 13.4050, 62.3600),
+        new Location("Shanghai", 31.2304, 121.4737, 281.04)
       ]
     }
   }
@@ -50,14 +50,35 @@ class App extends React.Component {
     }))
   }
 
+  async readLocationsFromQuery(query) {
+    console.log('reading locations from query ' + this.state.locationsLoaded)
+    if (!this.state.locationsLoaded) {
+        let preset = query.get('preset');
+        let locations = JSON.parse(atob(preset))
+        await this.setInitialLocations(locations)
+        this.updateCoords();
+    }
+  }
+  
+  async setInitialLocations(names) {
+    console.log('setting initial locations')
+    this.setState(curr => ({
+      locations: names.map(name => new Location(name, 0, 0, 0)),
+      locationsLoaded: true
+    }))
+  }
+
   render() {
-    return (
-        Wrap({
-          locations: this.state.locations,
-          addLocation: this.addLocation.bind(this),
-          updateCoords: this.updateCoords.bind(this),
-          updateName: this.updateName.bind(this)
-        })
+    return (  
+      <Router>
+        <Wrap
+          locations={this.state.locations}
+          addLocation={this.addLocation.bind(this)} 
+          readLocationsFromQuery={this.readLocationsFromQuery.bind(this)}
+          updateCoords={this.updateCoords.bind(this)}
+          updateName={this.updateName.bind(this)}
+        />
+      </Router>
       );
   }
 
